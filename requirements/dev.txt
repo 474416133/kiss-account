@@ -1,0 +1,4 @@
+-r prod.txt
+alembic==1.13.2
+psycopg2-binary==2.9.10
+pytest==8.2.2

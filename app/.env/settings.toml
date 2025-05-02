@@ -1,0 +1,24 @@
+[default]
+workers = 1
+code_expired_interval = 600
+token_expired_interval = 604800
+
+
+[default.database]
+hostname = "127.0.0.1:5432"
+name = "kiss"
+user = "postgres"
+passwprd_encrypted = "ce9490cf3e0cf830faa2fb518498a79c1d319e0bf36cd1da72d81713adce9eb2066daeb90a105098f5f4525a35426572636f4b9c44b04d32a0b79742879e86f3243dfc7751377396df3d99fad64e94dc2230c02c175026e80199648be8fe40bfaeb16fb60f148800"
+dialect = "postgresql+asyncpg"
+options = {max_overflow=10, echo=true}
+
+[default.logging]
+path = "../logs"
+level = "DEBUG"
+
+
+[dev]
+[dev.database]
+host = "127.0.0.5"
+dynaconf_merge=true
+
