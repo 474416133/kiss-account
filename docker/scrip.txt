@@ -1,0 +1,1 @@
+docker build .  3.11.12-slim
