@@ -25,6 +25,7 @@ router = APIRouter(prefix='/oauth2')
 
 @router.post('/token',
              summary='获取token',
+             tags=['授权'],
              response_model=Response[AccessToken])
 async def get_token(client: Client,
                     conn: Conn,
@@ -35,6 +36,7 @@ async def get_token(client: Client,
 
 @router.post('/password/code',
              summary='获取动态密码',
+             tags=['授权'],
              response_model=Response)
 async def create_password_code(client: Client,
                     conn: Conn,

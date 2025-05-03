@@ -28,16 +28,16 @@ class PasswordMode(BaseModel):
     password: str = Field(..., description='密码/code')
 
 
-
 class PasswordCode(BaseModel):
     password_type: PasswordType = Field(default=PasswordType.EMAIL_CODE, description='密码模式登录类型')
-    username: str = Field(..., description='密码模式登录类型')
+    username: str = Field(..., description='email/mobile')
 
     @model_validator(mode='after')
     def validate_(self):
         if self.password_type == PasswordType.PASSWORD:
             raise ValueError('password_type参数错误')
         return self
+
 
 
 class User(BaseModel):

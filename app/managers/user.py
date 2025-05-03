@@ -183,6 +183,13 @@ async def get_user_related_by_username(user_related_cls, username: str, *, conn:
 
 
 
+async def get_user_related_by_userid(user_related_cls, user_id: int, *, conn: 'Session') -> UserEmail | UserMobile:
+    stmt = select(user_related_cls).where(user_related_cls.user_id == user_id)
+    ret = await conn.execute(stmt)
+    return ret.scalar_one_or_none()
+
+
+
 async def create_user_password_code0(username: str, user_id: int, client: Client, *, conn: 'Session'):
     code = ''.join(map(str, (random.randint(0, 9) for i in range(0, 6))))
     user_pwd_code = UserPasswordCode(username=username,
@@ -195,25 +202,68 @@ async def create_user_password_code0(username: str, user_id: int, client: Client
     await conn.commit()
     return user_pwd_code
 
+async def create_user_password_code_by_email(user_related: UserEmail, client: Client, *, conn: 'Session'):
+    user_password_code = await create_user_password_code0(user_related.username,
+                                                          user_related.user_id if user_related else None,
+                                                          client,
+                                                          conn=conn)
+    # send email
+
+
+
+async def create_user_password_code_by_mobile(user_related: UserMobile, client: Client, *, conn: 'Session'):
+    user_password_code = await create_user_password_code0(user_related.username,
+                                                          user_related.user_id if user_related else None,
+                                                          client,
+                                                          conn=conn)
+    # send mobile
+
+
 
 async def create_user_password_code(username: str, password_type: PasswordType, client: Client, *, conn: 'Session'):
+    created = False
     match password_type:
         case PasswordType.EMAIL_CODE:
             user_related = await get_user_related_by_username(UserEmail, username, conn=conn)
-            user_password_code = await create_user_password_code0(username,
-                                                                  user_related.user_id if user_related else None,
-                                                                  client,
-                                                                  conn=conn)
-            # send email
+            if user_related:
+                await create_user_password_code_by_email(user_related, client, conn=conn)
+                created = True
+
 
         case PasswordType.MOBILE_CODE:
             user_related = await get_user_related_by_username(UserEmail, username, conn=conn)
-            user_password_code = await create_user_password_code0(username,
-                                                                  user_related.user_id if user_related else None,
-                                                                  client, conn=conn)
-            # send emsg
+            if user_related:
+                await create_user_password_code_by_mobile(user_related, client, conn=conn)
+                created = True
+
         case _:
             raise errors.DATA_VALIDATE_ERROR('password_type is not support yet')
+
+    if not created:
+        raise errors.DATA_VALIDATE_ERROR('password_type is not support yet')
+
+
+async def create_user_password_code_by_user(user: User, password_type: PasswordType, client: Client, *, conn: 'Session'):
+    created = False
+    match password_type:
+        case PasswordType.EMAIL_CODE:
+            user_related = await get_user_related_by_userid(UserEmail, user.id, conn=conn)
+            if user_related:
+                await create_user_password_code_by_email(user_related, client, conn=conn)
+                created = True
+
+
+        case PasswordType.MOBILE_CODE:
+            user_related = await get_user_related_by_userid(UserMobile, user.id, conn=conn)
+            if user_related:
+                await create_user_password_code_by_mobile(user_related, client, conn=conn)
+                created = True
+
+        case _:
+            raise errors.DATA_VALIDATE_ERROR('password_type is not support yet')
+
+    if not created:
+        raise errors.DATA_VALIDATE_ERROR('password_type is not support yet')
 
 
 async def change_user_password(user: User,
