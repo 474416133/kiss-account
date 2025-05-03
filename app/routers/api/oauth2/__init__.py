@@ -15,7 +15,7 @@ from app.common.responses import OK
 from app.managers import user as user_mgr
 from app.routers.schemas import AccessToken
 from app.routers.schemas import PasswordMode
-
+from app.routers.schemas import PasswordCode
 
 from app.routers.depends import Conn
 from app.routers.depends import Client
@@ -29,16 +29,15 @@ router = APIRouter(prefix='/oauth2')
 async def get_token(client: Client,
                     conn: Conn,
                     login_form: PasswordMode = Body(..., title='')):
-    user_token = await user_mgr.authorize_by_password(login_form, client, conn=conn)
+    user_token = await user_mgr.authorize(login_form, client, conn=conn)
     return OK(user_token)
 
 
-@router.get('/password/code',
+@router.post('/password/code',
              summary='获取动态密码',
              response_model=Response)
 async def create_password_code(client: Client,
                     conn: Conn,
-                    username: str = Query(..., title='用户名'),
-                    password_type: int = Query(..., title='密码模式')):
-    await user_mgr.create_user_password_code(username, password_type, client, conn=conn)
+                    password_code: PasswordCode = Body(..., title='body')):
+    await user_mgr.create_user_password_code(password_code.username, password_code.password_type , client, conn=conn)
     return OK(None)

@@ -17,6 +17,7 @@ from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.dialects.postgresql import SMALLINT
 from sqlalchemy.dialects.postgresql import BIGINT
 from sqlalchemy.dialects.postgresql import BOOLEAN
+from sqlalchemy.dialects.postgresql import CHAR
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import mapped_column
@@ -38,8 +39,8 @@ AccountStateChoice = AccountState.choices()
 
 class User(RecordMixin, Base):
     __tablename__ = 'user_account'
-
-    password_encrypted: Mapped[str] = mapped_column(TEXT, comment='加密密码')
+    username: Mapped[str] = mapped_column(String(64), unique=True, comment='用户名')
+    password_encrypted: Mapped[Optional[str]] = mapped_column(TEXT, comment='加密密码')
     nickname: Mapped[str] = mapped_column(String(30), comment='昵称')
     avatar_url: Mapped[str] = mapped_column(String(300), comment='头像url')
     enabled: Mapped[bool] = mapped_column(BOOLEAN, default=True, comment='是否可用')
@@ -76,7 +77,7 @@ class UserMobile(RecordMixin, Base):
 class UserPasswordCode(RecordMixin, Base):
     __tablename__ = 'user_password_code'
 
-    user_id: Mapped[fk] = mapped_column(ForeignKey("user_account.id"))
+    user_id: Mapped[Optional[fk]] = mapped_column(ForeignKey("user_account.id"))
     username: Mapped[str] = mapped_column(String(64), comment='用户名')
     code: Mapped[str] = mapped_column(String(6), comment='登录用的code')
     expired_at: Mapped[int] = mapped_column(BIGINT)

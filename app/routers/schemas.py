@@ -17,16 +17,27 @@ from app.predefine import AuthorizeFail
 
 @enum.unique
 class PasswordType(enum.IntEnum):
-    EMAIL_PASSWORD = 1
+    PASSWORD = 1
     EMAIL_CODE = 2
-    MOBILE_PASSWORD = 3
     MOBILE_CODE = 4
 
 
 class PasswordMode(BaseModel):
-    password_type: PasswordType = Field(default=PasswordType.EMAIL_PASSWORD, description='密码模式登录类型')
+    password_type: PasswordType = Field(default=PasswordType.PASSWORD, description='密码模式登录类型')
     username: str = Field(..., description='密码模式登录类型')
     password: str = Field(..., description='密码/code')
+
+
+
+class PasswordCode(BaseModel):
+    password_type: PasswordType = Field(default=PasswordType.EMAIL_CODE, description='密码模式登录类型')
+    username: str = Field(..., description='密码模式登录类型')
+
+    @model_validator(mode='after')
+    def validate_(self):
+        if self.password_type == PasswordType.PASSWORD:
+            raise ValueError('password_type参数错误')
+        return self
 
 
 class User(BaseModel):
@@ -82,4 +93,21 @@ class Client(BaseModel):
             except:
                 raise AuthorizeFail('client_id不合法')
 
+        return self
+
+
+
+class UserPassword(BaseModel):
+    password_type0: PasswordType = Field(default=PasswordType.PASSWORD, description='密码模式登录类型')
+    code_or_password0: str = Field(..., description='原始密码')
+    password: str = Field(..., description='密码')
+    password_confirmed: str = Field(..., description='确认的密码')
+
+    @model_validator(mode='after')
+    def validate_(self):
+        if self.password_type0 == PasswordType.PASSWORD and self.password == self.code_or_password0:
+            raise ValueError('新密码和旧密码不能一样')
+
+        if self.password_confirmed != self.password:
+            raise ValueError('password != password_confirmed')
         return self

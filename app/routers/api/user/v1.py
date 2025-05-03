@@ -14,7 +14,7 @@ from fastapi import Depends
 from app.common.responses import Response, OK
 from app.routers.schemas import UserRegister
 from app.routers.schemas import User
-from app.models.user import UserEmail
+from app.routers.schemas import UserPassword
 from app.managers import user as user_mgr
 
 from app.routers.depends import Token
@@ -29,11 +29,11 @@ router = APIRouter(prefix='/v1')
 
 @router.post('/account',
              summary='创建账号',
-             response_model=Response)
+             response_model=Response[User])
 async def create_account(conn: Conn,
                          client: Client,
                          user: UserRegister = Body(..., title='注册信息')):
-    await user_mgr.register(user, UserEmail, conn=conn)
+    await user_mgr.register(user, conn=conn)
     return OK(None)
 
 
@@ -49,3 +49,14 @@ async def get_me(
     return OK(user)
 
 
+@router.patch('/account/password',
+             summary='创建账号',
+             response_model=Response,
+              dependencies=[Depends(authenticated)])
+async def create_account(conn: Conn,
+                         client: Client,
+                         user: CurrentUser,
+                         user_password: UserPassword = Body(..., title='注册信息'),
+                         ):
+    await user_mgr.change_user_password(user, user_password, client,  conn=conn)
+    return OK(None)

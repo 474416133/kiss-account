@@ -12,6 +12,7 @@ import functools
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import delete
+from sqlalchemy import update
 from app.common.responses import Page
 from app.models.base import Base
 
@@ -61,6 +62,13 @@ async def paging(stmt, page=1, page_size=10, order_by=None, *, conn: 'Session', 
         records = list(map(item_handler, records))
 
     return Page.construct(records, count, page_size, page)
+
+
+async def  update_by_pk(model_cls: Base, pk: int, values, *, conn: 'Session'):
+    stmt = update(model_cls).values(**values).filter(model_cls.id==pk)
+    await conn.execute(stmt)
+    await conn.commit()
+
 
 
 
