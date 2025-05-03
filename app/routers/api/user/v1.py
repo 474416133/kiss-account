@@ -13,10 +13,10 @@ from fastapi import Body
 from fastapi import Depends
 from fastapi import Query
 from app.common.responses import Response, OK
-from app.routers.schemas import UserRegister
-from app.routers.schemas import User
-from app.routers.schemas import UserPassword
-from app.routers.schemas import PasswordType
+from app.schemas.user import UserRegister
+from app.schemas.authorize import User
+from app.schemas.user import UserPassword
+from app.schemas.authorize import PasswordType
 from app.managers import user as user_mgr
 from app.routers.depends import Token
 from app.routers.depends import CurrentUser

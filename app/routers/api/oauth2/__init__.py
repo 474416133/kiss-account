@@ -8,14 +8,13 @@
 @Desc   ：
 """
 from fastapi import APIRouter
-from fastapi import Query
 from fastapi import Body
 from app.common.responses import Response
 from app.common.responses import OK
 from app.managers import user as user_mgr
-from app.routers.schemas import AccessToken
-from app.routers.schemas import PasswordMode
-from app.routers.schemas import PasswordCode
+from app.schemas.authorize import AccessToken
+from app.schemas.authorize import PasswordMode
+from app.schemas.authorize import PasswordCode
 
 from app.routers.depends import Conn
 from app.routers.depends import Client

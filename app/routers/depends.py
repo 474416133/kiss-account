@@ -1,14 +1,13 @@
 import logging
 from typing import Annotated
 
-import jwt
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import Request
 from fastapi import status
 from fastapi.security import OAuth2PasswordBearer
 from app.engines import Session
-from app.routers.schemas import Client as Client_
+from app.schemas.authorize import Client as Client_
 from app.managers.user import get_user_by_token
 
 

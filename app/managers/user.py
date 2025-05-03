@@ -10,12 +10,12 @@
 import time
 import random
 from sqlalchemy import select
-from app.routers.schemas import UserRegister
-from app.routers.schemas import PasswordType
-from app.routers.schemas import PasswordMode
-from app.routers.schemas import UserPassword
-from app.routers.schemas import Client
-from app.routers.schemas import AccessToken
+from app.schemas.user import UserRegister
+from app.schemas.authorize import PasswordType
+from app.schemas.authorize import PasswordMode
+from app.schemas.user import UserPassword
+from app.schemas.authorize import Client
+from app.schemas.authorize import AccessToken
 from app.common.utils import gm
 from app.common.utils import date
 from app.settings import settings, encrypt, decrypt
